@@ -16,7 +16,7 @@ The goal of this project is to demonstrate how to build a modern .NET applicatio
 </p>
 
 <p>
-  <img src="docs/docker-container.png" width="48%" />
+  <img src="docs/docker-containers.png" width="48%" />
   <img src="docs/swagger.png" width="48%" />
 </p>
 
