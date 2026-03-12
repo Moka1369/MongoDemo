@@ -1,12 +1,18 @@
 ## Overview
 
-Full-stack .NET sample demonstrating Clean Architecture, MongoDB integration, Blazor UI, and Docker containerization.
+Full-stack .NET sample demonstrating Clean Architecture, MongoDB integration, Blazor UI, CQRS, and Docker containerization.
 
 # MongoDemo – Clean Architecture Full-Stack .NET Application
 
-MongoDemo is a full-stack sample application built with ASP.NET Core Web API, Clean Architecture principles, MongoDB, Blazor Web App, MudBlazor UI, and Docker Compose.
+![.NET](https://img.shields.io/badge/.NET-9-512BD4)
+![Blazor](https://img.shields.io/badge/Blazor-WebApp-512BD4)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248)
+![Docker](https://img.shields.io/badge/Docker-2496ED)
+![Clean Architecture](https://img.shields.io/badge/Architecture-Clean-orange)
+![CQRS](https://img.shields.io/badge/Pattern-CQRS-purple)
+![MediatR](https://img.shields.io/badge/MediatR-Application-blue)
 
-The goal of this project is to demonstrate how to build a modern .NET application with proper architecture, containerization, and a clean separation of concerns.
+MongoDemo is a full-stack sample application built with ASP.NET Core Web API, Clean Architecture principles, MongoDB, Blazor Web App, MudBlazor UI, and Docker Compose.
 
 ## UI Preview
 
@@ -34,32 +40,33 @@ The application runs in a multi-container Docker setup:
 
 The project follows Clean Architecture:
 
+```
 MongoDemo.Api → Presentation Layer  
 MongoDemo.Application → Application Logic (CQRS / MediatR)  
 MongoDemo.Domain → Domain Models  
 MongoDemo.Infrastructure → MongoDB access  
 MongoDemo.Ui → Blazor Web UI  
+```
 
-## Features
+## Key Features
 
 Customer Management:
 
-• Create customer  
-• Edit customer  
-• Delete customer  
-• View customer details  
-• Customer list UI  
+- Create customer  
+- Edit customer  
+- Delete customer  
+- View details  
+- List view  
 
-Technical Features:
+Technical:
 
-• Clean Architecture  
-• CQRS with MediatR  
-• MongoDB integration  
-• Blazor Web App UI  
-• MudBlazor components  
-• Dockerized API + UI + MongoDB  
-• Environment configuration  
-• Dependency Injection  
+- Clean Architecture
+- CQRS (MediatR)
+- MongoDB Repository Pattern
+- Blazor UI
+- MudBlazor Components
+- Docker multi-container setup
+- Dependency Injection
 
 ## Technologies
 
@@ -97,27 +104,44 @@ MongoDemo
 ## Running with Docker (recommended)
 
 Start everything:
+
+```
 docker compose up --build
+```
+
 Application URLs:
 
 UI:
 ```
 http://localhost:5069
 ```
+
 API:
 ```
 http://localhost:5057/swagger
 ```
+
 MongoDB:
+```
 mongodb://localhost:27017
+```
+
 ## Running without Docker
 
 Run API:
+
+```
 cd MongoDemo.Api
 dotnet run
+```
+
 Run UI:
+
+```
 cd MongoDemo.Ui
 dotnet run
+```
+
 ## Configuration
 
 MongoDB settings are configured via:
