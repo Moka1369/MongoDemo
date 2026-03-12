@@ -1,3 +1,7 @@
+## Overview
+
+Full-stack .NET sample demonstrating Clean Architecture, MongoDB integration, Blazor UI, and Docker containerization.
+
 # MongoDemo – Clean Architecture Full-Stack .NET Application
 
 MongoDemo is a full-stack sample application built with ASP.NET Core Web API, Clean Architecture principles, MongoDB, Blazor Web App, MudBlazor UI, and Docker Compose.
@@ -6,21 +10,14 @@ The goal of this project is to demonstrate how to build a modern .NET applicatio
 
 ## UI Preview
 
-### Customer List
-![Customer List](docs/customers.png)
+<p>
+  <img src="docs/customers.png" width="48%" />
+  <img src="docs/create.png" width="48%" />
+</p>
 
-### Create Customer
-![Create Customer](docs/create.png)
-
-### Edit Customer
-![Edit Customer](docs/edit.png)
-
-### Swagger API
-![Swagger](docs/swagger.png)
-
-<p float="left">
-  <img src="docs/customers.png" width="45%" />
-  <img src="docs/create.png" width="45%" />
+<p>
+  <img src="docs/edit.png" width="48%" />
+  <img src="docs/swagger.png" width="48%" />
 </p>
 
 ## Docker Environment
@@ -87,6 +84,7 @@ Infrastructure:
 • MongoDB container  
 
 ## Project Structure
+```
 MongoDemo
 │
 ├── MongoDemo.Api
@@ -94,6 +92,8 @@ MongoDemo
 ├── MongoDemo.Domain
 ├── MongoDemo.Infrastructure
 └── MongoDemo.Ui
+```
+
 ## Running with Docker (recommended)
 
 Start everything:
@@ -101,9 +101,13 @@ docker compose up --build
 Application URLs:
 
 UI:
+```
 http://localhost:5069
+```
 API:
+```
 http://localhost:5057/swagger
+```
 MongoDB:
 mongodb://localhost:27017
 ## Running without Docker
@@ -126,14 +130,6 @@ MongoDb__DatabaseName
 MongoDb__CustomersCollectionName
 API Base URL can be configured:
 ApiSettings__BaseUrl
-## Screenshots
-
-(Add screenshots here)
-
-Customer List  
-Customer Create  
-Customer Edit  
-Swagger API  
 
 ## Learning Goals
 
