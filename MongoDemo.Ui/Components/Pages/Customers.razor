@@ -1,0 +1,174 @@
+@page "/customers"
+@* @rendermode InteractiveServer *@
+@using MongoDemo.Ui.Models
+@using MongoDemo.Ui.Services
+@using MudBlazor
+@implements IDisposable
+@inject CustomerApiService CustomerApi
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+<PageTitle>Customers</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" class="mt-6">
+    <MudPaper class="pa-4">
+        <div class="d-flex justify-space-between align-center mb-4">
+            <MudText Typo="Typo.h4">Customers</MudText>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"
+                       OnClick="CreateCustomer">
+                New Customer
+            </MudButton>
+        </div>
+    </MudPaper>
+</MudContainer>
+
+@if (_isLoading)
+{
+    <div class="d-flex justify-center pa-6">
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" />
+    </div>
+}
+else if (_customers is null || _customers.Count == 0)
+{
+    <MudAlert Severity="Severity.Info" Variant="Variant.Filled"> Keine Customers gefunden.</MudAlert>
+}
+else
+{
+    <MudTable Items="_customers" Hover="true" Striped="true" Bordered="false" Dense="false" Elevation="0">
+
+        <HeaderContent>
+            <MudTh>First Name</MudTh>
+            <MudTh>Last Name</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh>Created</MudTh>
+            <MudTh class="text-end">Actions</MudTh>
+        </HeaderContent>
+
+        <RowTemplate>
+            <MudTd DataLabel="First Name">@context.FirstName</MudTd>
+            <MudTd DataLabel="Last Name">@context.LastName</MudTd>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            <MudTd DataLabel="Created">@context.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm")</MudTd>
+            <MudTd DataLabel="Actions" Class="text-end">
+                <MudIconButton Icon="@Icons.Material.Filled.Visibility" Color="Color.Info" Size="Size.Medium"
+                               OnClick="@(() => GoToDetails(context.Id))" />
+
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Medium"
+                               OnClick="@(() => EditById(context.Id))" />
+
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Size="Size.Medium"
+                               OnClick="@(() => DeleteById(context.Id))" />
+            </MudTd>
+        </RowTemplate>
+
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+
+    </MudTable>
+}
+@* @if (_customers is null)
+{
+    <p>Lade Daten...</p>
+}
+else if (_customers.Count == 0)
+{
+    <p>Keine Customers gefunden.</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>FirstName</th>
+                <th>LastName</th>
+                <th>Email</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var customer in _customers)
+            {
+                <tr>
+                    <td>@customer.FirstName</td>
+                    <td>@customer.LastName</td>
+                    <td>@customer.Email</td>
+                    <td>@customer.CreatedAtUtc</td>
+                    <td>
+                        <button @onclick="() => GotoDetails(customer.Id)">Details</button>
+                        <button @onclick="() => EditById(customer.Id)">Edit</button>
+                        <button @onclick="() => DeleteById(customer.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+} *@
+@code {
+    private List<CustomerDto>? _customers = new();
+    private bool _isLoading = true;
+    private bool _disposed;
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCustomers();
+
+    }
+    private async Task LoadCustomers()
+    {
+        if (_disposed)
+            return;
+        _isLoading = true;
+        try
+        {
+            var customers = await CustomerApi.GetAllAsync();
+
+            if (_disposed)
+                return;
+
+            _customers = customers;
+        }
+        catch
+        {
+
+            if (_disposed)
+                return;
+
+            Snackbar.Add("Fehler beim Laden der Customers", Severity.Error);
+        }
+        finally
+        {
+            if (!_disposed)
+            {
+                _isLoading = false;
+            }
+        }
+    }
+    private void CreateCustomer() => Navigation.NavigateTo("/customers/create");
+    private void GoToDetails(string id)
+    {
+        Navigation.NavigateTo($"/customers/{id}");
+    }
+    private void EditById(string id) => Navigation.NavigateTo($"/customers/edit/{id}");
+    private async Task DeleteById(string id)
+    {
+        Console.WriteLine("Delete started");
+        var ok = await CustomerApi.DeleteAsync(id);
+        if (_disposed)
+            return;
+        if (ok)
+        {
+            Snackbar.Add("Customer erfolgreich gelöscht.", Severity.Success);
+            await LoadCustomers();
+            return;
+        }
+        else
+        {
+            Snackbar.Add("Customer konnte nicht gelöscht werden.", Severity.Error);
+        }
+    }
+    public void Dispose()
+    {
+        _disposed = true;
+    }
+
+}

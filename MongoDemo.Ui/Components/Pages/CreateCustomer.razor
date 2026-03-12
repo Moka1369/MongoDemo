@@ -1,0 +1,92 @@
+@page "/customers/create"
+@using MongoDemo.Ui.Models
+@using MongoDemo.Ui.Services
+@using MudBlazor
+
+@* @rendermode InteractiveServer *@
+
+@inject NavigationManager Navigation
+@inject CustomerApiService CustomerApi
+@inject ISnackbar Snackbar
+
+<PageTitle>Create Customer</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" class="mt-6">
+    <MudCard Elevation="4">
+        <MudCardHeader>
+            <MudText Typo="Typo.h5">
+                Create Customer
+            </MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudForm @ref="_form">
+                <MudTextField Label="First Name" @bind-Value="_model.FirstName" Required="true"
+                              RequiredError="FirstName ist erforderlich." />
+                <MudTextField Label="Last Name" @bind-Value="_model.LastName" Required="true"
+                              RequiredError="LastName ist erforderlich." Class="mt-3" />
+                <MudTextField Label="Email" @bind-Value="_model.Email" Required="true"
+                              RequiredError="Email ist erforderlich." Class="mt-3" />
+            </MudForm>
+        </MudCardContent>
+        <MudCardActions Class="pa-4">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Create" Disabled="_isSaving">
+                @(_isSaving ? "Saving..." : "Save")
+            </MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="GoBack"> Cancel</MudButton>
+        </MudCardActions>
+    </MudCard>
+</MudContainer>
+
+
+@* <EditForm Model="_model" OnValidSubmit="Create">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+    <div>
+        <label>First Name:</label>
+        <InputText class="form-control" @bind-Value="_model.FirstName" />
+    </div>
+    <div>
+        <label>Last Name:</label>
+        <InputText class="form-control" @bind-Value="_model.LastName" />
+    </div>
+    <div>
+        <label>Email:</label>
+        <InputText class="form-control" @bind-Value="_model.Email" />
+    </div>
+    <button type="submit">Save</button>
+    <button type="button" @onclick="GoBack">Cancel</button>
+</EditForm> *@
+
+@code
+{
+    private CreateCustomerRequest _model = new();
+    private MudForm? _form;
+    private bool _isSaving;
+ 
+    private async Task Create()
+    {
+        await _form.Validate();
+
+        if (!_form.IsValid) return;
+
+        _isSaving = true;
+
+        var ok = await CustomerApi.CreateAsync(_model);
+        if (ok)
+        {
+            Snackbar.Add("Customer created successfully.", Severity.Success);
+            Navigation.NavigateTo("/customers");
+        }
+        else
+        {
+            Snackbar.Add("Customer kann leider nicht gespeichert werden", Severity.Error);
+        }
+        _isSaving = false;
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/customers");
+    }
+
+}

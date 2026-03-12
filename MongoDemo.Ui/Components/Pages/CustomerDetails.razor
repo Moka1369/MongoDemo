@@ -1,0 +1,137 @@
+@page "/customers/{id}"
+
+@using MudBlazor
+@using MongoDemo.Ui.Models
+@using MongoDemo.Ui.Services
+
+@inject CustomerApiService CustomerApi
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>Customer Details</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-6">
+
+    @if (_isLoading)
+    {
+        <div class="d-flex justify-center pa-6">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" />
+        </div>
+    }
+    else if (!_customerFound || _customer is null)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Filled">
+            Customer wurde nicht gefunden.
+        </MudAlert>
+
+        <MudButton Class="mt-4"
+                   Variant="Variant.Outlined"
+                   OnClick="GoBack">
+            Back to List
+        </MudButton>
+    }
+    else
+    {
+        <MudCard Elevation="4">
+
+            <MudCardHeader>
+                <MudText Typo="Typo.h5">Customer Details</MudText>
+            </MudCardHeader>
+
+            <MudCardContent>
+                <MudStack Spacing="3">
+
+                    <MudPaper Class="pa-3" Elevation="0">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">First Name</MudText>
+                        <MudText Typo="Typo.body1">@_customer.FirstName</MudText>
+                    </MudPaper>
+
+                    <MudPaper Class="pa-3" Elevation="0">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">Last Name</MudText>
+                        <MudText Typo="Typo.body1">@_customer.LastName</MudText>
+                    </MudPaper>
+
+                    <MudPaper Class="pa-3" Elevation="0">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">Email</MudText>
+                        <MudText Typo="Typo.body1">@_customer.Email</MudText>
+                    </MudPaper>
+
+                    <MudPaper Class="pa-3" Elevation="0">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">Created At</MudText>
+                        <MudText Typo="Typo.body1">@_customer.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm")</MudText>
+                    </MudPaper>
+
+                    <MudPaper Class="pa-3" Elevation="0">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">Id</MudText>
+                        <MudText Typo="Typo.body2">@_customer.Id</MudText>
+                    </MudPaper>
+
+                </MudStack>
+            </MudCardContent>
+
+            <MudCardActions Class="pa-4">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Edit"
+                           OnClick="GoToEdit">
+                    Edit
+                </MudButton>
+
+                <MudButton Variant="Variant.Outlined"
+                           OnClick="GoBack">
+                    Back
+                </MudButton>
+            </MudCardActions>
+
+        </MudCard>
+    }
+
+</MudContainer>
+
+@code {
+    [Parameter]
+    public string id { get; set; } = string.Empty;
+
+    private CustomerDto? _customer;
+    private bool _isLoading = true;
+    private bool _customerFound = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCustomer();
+    }
+
+    private async Task LoadCustomer()
+    {
+        _isLoading = true;
+
+        try
+        {
+            _customer = await CustomerApi.GetByIdAsync(id);
+
+            if (_customer is null)
+            {
+                _customerFound = false;
+            }
+        }
+        catch
+        {
+            _customerFound = false;
+            Snackbar.Add("Fehler beim Laden der Customer-Details.", Severity.Error);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void GoToEdit()
+    {
+        Navigation.NavigateTo($"/customers/edit/{id}");
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/customers");
+    }
+}

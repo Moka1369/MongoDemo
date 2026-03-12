@@ -1,0 +1,148 @@
+@page "/customers/edit/{id}"
+
+@using MudBlazor
+@using MongoDemo.Ui.Models
+@using MongoDemo.Ui.Services
+
+@inject CustomerApiService CustomerApi
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>Edit Customer</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" class="mt-6">
+    @if (_isLoading)
+    {
+        <div class="d-flex justify-center pa-6">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" />
+        </div>
+    }
+    else if (!_customerFound)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Filled">
+            Customer wurde nicht gefunden.
+        </MudAlert>
+
+        <MudButton Class="mt-4" Variant="Variant.Outlined" OnClick="GoBack">
+            Back to List
+        </MudButton>
+    }
+    else
+    {
+        <MudCard Elevation="4">
+
+            <MudCardHeader>
+                <MudText Typo="Typo.h5">Edit Customer</MudText>
+            </MudCardHeader>
+
+            <MudCardContent>
+                <MudForm @ref="_form">
+
+                    <MudTextField Label="First Name"                                  @bind-Value="_model.FirstName"                                  Required="true"
+                                  RequiredError="First name is required" />
+
+                    <MudTextField Label="Last Name"                                  @bind-Value="_model.LastName"                                  Required="true"
+                                  RequiredError="Last name is required"                                  Class="mt-3" />
+
+                    <MudTextField Label="Email"                                  @bind-Value="_model.Email"                                  Required="true"                                  RequiredError="Email is required"
+                                  Class="mt-3" />
+
+                </MudForm>
+            </MudCardContent>
+
+            <MudCardActions Class="pa-4">
+                <MudButton Variant="Variant.Filled"                           Color="Color.Primary"                           OnClick="SaveChanges"                           Disabled="_isSaving">
+                    @(_isSaving ? "Saving..." : "Save")
+                </MudButton>
+
+                <MudButton Variant="Variant.Outlined"                           OnClick="GoBack"                           Disabled="_isSaving">
+                    Cancel
+                </MudButton>
+            </MudCardActions>
+
+        </MudCard>
+    }
+</MudContainer>
+@code {
+    [Parameter]
+    public string id { get; set; } = string.Empty;
+
+    private UpdateCustomerRequest _model = new();
+    private MudForm? _form;
+    private bool _isLoading = true;
+    private bool _isSaving;
+    private bool _customerFound = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCustomer();
+    }
+
+    private async Task LoadCustomer()
+    {
+        _isLoading = true;
+
+        try
+        {
+            var customer = await CustomerApi.GetByIdAsync(id);
+
+            if (customer is null)
+            {
+                _customerFound = false;
+                return;
+            }
+
+            _model = new UpdateCustomerRequest
+            {
+                FirstName = customer.FirstName,
+                LastName = customer.LastName,
+                Email = customer.Email
+            };
+        }
+        catch
+        {
+            _customerFound = false;
+            Snackbar.Add("Fehler beim Laden des Customers.", Severity.Error);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task SaveChanges()
+    {
+        if (_form is null)
+            return;
+
+        await _form.Validate();
+
+        if (!_form.IsValid)
+            return;
+
+        _isSaving = true;
+
+        try
+        {
+            var ok = await CustomerApi.UpdateAsync(id, _model);
+
+            if (ok)
+            {
+                Snackbar.Add("Customer erfolgreich aktualisiert.", Severity.Success);
+                Navigation.NavigateTo("/customers");
+                return;
+            }
+
+            Snackbar.Add("Customer konnte nicht aktualisiert werden.", Severity.Error);
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/customers");
+    }
+}

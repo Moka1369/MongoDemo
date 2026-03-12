@@ -1,0 +1,40 @@
+services:
+  mongodemo-api:
+    build:
+      context: .
+      dockerfile: MongoDemo.Api/Dockerfile
+    container_name: mongodemo-api
+    ports:
+      - "5057:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      MongoDb__ConnectionString: mongodb://mongodemo-mongodb:27017
+      MongoDb__DatabaseName: MongoDemoDb
+      MongoDb__CustomersCollectionName: Customers
+    depends_on:
+      - mongodemo-mongodb
+
+  mongodemo-ui:
+    build:
+      context: .
+      dockerfile: MongoDemo.Ui/Dockerfile
+    container_name: mongodemo-ui
+    ports:
+      - "5069:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ApiSettings__BaseUrl: http://mongodemo-api:8080/
+    depends_on:
+      - mongodemo-api
+
+  mongodemo-mongodb:
+    image: mongo:7
+    container_name: mongodemo-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodemo-mongo-data:/data/db
+
+volumes:
+  mongodemo-mongo-data:
+ 
