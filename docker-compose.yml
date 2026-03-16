@@ -7,10 +7,10 @@ services:
     ports:
       - "5057:8080"
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      MongoDb__ConnectionString: mongodb://mongodemo-mongodb:27017
-      MongoDb__DatabaseName: MongoDemoDb
-      MongoDb__CustomersCollectionName: Customers
+      ASPNETCORE_ENVIRONMENT: Docker
+      MongoDbSettings__ConnectionString: mongodb://mongodemo-mongodb:27017
+      MongoDbSettings__DatabaseName: MongoDemoDb
+      MMongoDbSettings__CustomersCollectionName: Customers
     depends_on:
       - mongodemo-mongodb
 
@@ -22,7 +22,7 @@ services:
     ports:
       - "5069:8080"
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: Docker
       ApiSettings__BaseUrl: http://mongodemo-api:8080/
     depends_on:
       - mongodemo-api
